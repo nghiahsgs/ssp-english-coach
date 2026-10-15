@@ -52,8 +52,8 @@ const feedbackSchema = {
   type: "object",
   properties: {
     understandable: { type: "boolean" },
-    corrected: { type: "string" },
-    natural: { type: "string" },
+    corrected: { type: "string", minLength: 1 },
+    natural: { type: "string", minLength: 1 },
     feedback: { type: "array", minItems: 1, maxItems: 3, items: { type: "string" } },
     nextExercise: {
       type: "object",
@@ -104,6 +104,17 @@ async function ollamaChat({ model, messages, format, think = false }) {
   } catch {
     throw new Error("Model không trả về JSON hợp lệ. Hãy thử lại hoặc chọn model khác.");
   }
+}
+
+function normalizeFeedback(result, exercise) {
+  if (!result.natural?.trim()) result.natural = result.corrected;
+  result.nextExercise.target = exercise.target;
+
+  // Model nhỏ đôi khi gọi nhầm dạng -ing là quá khứ dù câu sửa vẫn đúng.
+  result.feedback = result.feedback.map((item) =>
+    item.replace(/(['“”][A-Za-z]+ing['“”])\s*\(dạng quá khứ\)/gi, "$1 (dạng -ing)"),
+  );
+  return result;
 }
 
 async function handleApi(req, res) {
@@ -168,9 +179,12 @@ Every item in the feedback array MUST be written in Vietnamese. Give at most thr
 Apply these constraints strictly:
 - A finished past-time marker such as "yesterday" requires the past simple.
 - Past-simple affirmative: subject + past-tense verb. Do not claim that it needs "did".
+- Call forms such as "tested" in a past-simple affirmative "V2" or "dạng quá khứ", never "past participle" or "quá khứ phân từ".
 - Past-simple negative or question: did/didn't + base verb. Never use a past participle after did.
 - Present perfect: have/has + past participle. Use it for an unfinished period or a result connected to now, especially with "yet".
 - Do not introduce present perfect continuous unless duration or ongoing activity is explicitly intended.
+- Address the learner directly as "bạn", not "học sinh" or "người học".
+- The next exercise must practice the same target weakness as the current exercise. Copy its target label exactly.
 - If the corrected and natural versions are the same, repeat the corrected sentence instead of returning an empty string.
 - Keep the natural version close to the original meaning. Do not add a new result or claim.`,
         },
@@ -180,7 +194,7 @@ Apply these constraints strictly:
         },
       ],
     });
-    return sendJson(res, 200, result);
+    return sendJson(res, 200, normalizeFeedback(result, exercise));
   }
 
   return false;
