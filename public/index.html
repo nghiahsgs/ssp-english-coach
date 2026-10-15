@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SSP English Coach — Prototype</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">THROWAWAY PROTOTYPE</p>
+        <h1>Học tiếng Anh từ chính cuộc họp của bạn</h1>
+      </div>
+      <div class="header-meta">
+        <div class="privacy"><span></span> AI chạy local bằng Ollama</div>
+        <div id="usage" class="usage">Đã học: 0 transcript · 0 câu</div>
+      </div>
+    </header>
+
+    <main>
+      <section id="input-stage" class="stage active">
+        <div class="stage-heading">
+          <span class="step">01</span>
+          <div>
+            <h2>Dán transcript</h2>
+            <p>AI chỉ phân tích lời của bạn và bỏ qua những lỗi có thể do máy ghi âm.</p>
+          </div>
+        </div>
+
+        <p class="prototype-note"><strong>Lưu ý:</strong> model local có thể giải thích sai. Bản này dùng để kiểm tra thói quen học và luồng sản phẩm, chưa phải giáo trình chuẩn.</p>
+
+        <div class="input-grid">
+          <label>
+            Tên của bạn trong transcript
+            <input id="learner-name" value="Andie Nguyen" />
+          </label>
+          <label>
+            Local model
+            <select id="model"><option>Đang tìm model…</option></select>
+          </label>
+        </div>
+
+        <label>
+          Transcript cuộc họp
+          <textarea id="transcript" rows="14" aria-label="Transcript cuộc họp" placeholder="Dán transcript Slack, Teams hoặc tl;dv vào đây…"></textarea>
+        </label>
+
+        <div class="actions">
+          <button id="analyze" class="primary">Phân tích và tạo bài học</button>
+          <span id="input-status" class="status"></span>
+        </div>
+      </section>
+
+      <section id="lesson-stage" class="stage" hidden>
+        <div class="stage-heading">
+          <span class="step">02</span>
+          <div>
+            <h2>Bài học của bạn</h2>
+            <p id="overall"></p>
+          </div>
+        </div>
+
+        <div id="strengths" class="strengths"></div>
+        <div id="focus-areas" class="focus-grid"></div>
+
+        <button id="start-practice" class="primary">Làm bài tập đầu tiên</button>
+      </section>
+
+      <section id="practice-stage" class="stage" hidden>
+        <div class="stage-heading">
+          <span class="step">03</span>
+          <div>
+            <h2>Luyện dịch</h2>
+            <p>Viết theo phản xạ đầu tiên. AI sẽ tăng độ khó dựa trên câu trả lời.</p>
+          </div>
+        </div>
+
+        <div class="exercise-card">
+          <p class="exercise-meta"><span id="exercise-number">Bài 1</span><span id="exercise-target"></span></p>
+          <blockquote id="exercise-text"></blockquote>
+          <p id="exercise-context" class="muted"></p>
+        </div>
+
+        <label>
+          Câu tiếng Anh của bạn
+          <textarea id="answer" rows="4" aria-label="Câu tiếng Anh của bạn" placeholder="Type your answer here…"></textarea>
+        </label>
+
+        <div class="actions">
+          <button id="check-answer" class="primary">Kiểm tra</button>
+          <span id="answer-status" class="status"></span>
+        </div>
+
+        <article id="feedback" class="feedback" hidden>
+          <p id="verdict" class="verdict"></p>
+          <div>
+            <span class="result-label">Câu sửa</span>
+            <p id="corrected" class="answer-line"></p>
+          </div>
+          <div>
+            <span class="result-label">Tự nhiên hơn</span>
+            <p id="natural" class="answer-line"></p>
+          </div>
+          <ul id="feedback-list"></ul>
+          <button id="next-exercise" class="secondary">Bài tiếp theo</button>
+        </article>
+      </section>
+    </main>
+
+    <footer>Không tài khoản · Không database · Không gửi dữ liệu ra ngoài máy</footer>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
